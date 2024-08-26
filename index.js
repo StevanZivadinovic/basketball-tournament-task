@@ -1,4 +1,5 @@
 const fs = require('fs');
+console.log(`Node.js version: ${process.version}`);
 
 // Load data
 const groupsData = JSON.parse(fs.readFileSync('groups.json', 'utf8'));
