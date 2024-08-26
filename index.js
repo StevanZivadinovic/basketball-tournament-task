@@ -131,7 +131,6 @@ function simulateGroupStage() {
     return standings;
 }
 
-// Flatten array utility function
 function flattenArray(arr) {
     return arr.reduce((acc, val) => acc.concat(val), []);
 }
