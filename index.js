@@ -3,7 +3,7 @@ console.log(`Node.js version: ${process.version}`);
 
 // Load data
 const groupsData = JSON.parse(fs.readFileSync('groups.json', 'utf8'));
-const exibitionsData = JSON.parse(fs.readFileSync('exibitions.json', 'utf8'));
+const exhibitionsData = JSON.parse(fs.readFileSync('exibitions.json', 'utf8'));
 
 function calculateForm(team, exhibitions) {
     const matches = exhibitions[team];
@@ -45,8 +45,8 @@ function initializeStandings(teams) {
 // Simulate match
 function simulateMatch(team1, team2) {
     // Calculate form for both teams
-    const form1 = calculateForm(team1.code, exibitionsData);
-    const form2 = calculateForm(team2.code, exibitionsData);
+    const form1 = calculateForm(team1.code, exhibitionsData);
+    const form2 = calculateForm(team2.code, exhibitionsData);
 
     // Base score with form adjustments
     const team1Score = Math.floor(Math.random() * (100 + form1.averageScore)) + form1.averageDifference;
@@ -113,8 +113,8 @@ function simulateGroupStage() {
                 const team1 = teams[i];
                 const team2 = teams[j];
                 const result = simulateMatch(
-                    { ISOCode: team1.ISOCode, fibaRanking: team1.FIBARanking },
-                    { ISOCode: team2.ISOCode, fibaRanking: team2.FIBARanking }
+                    { code: team1.ISOCode, fibaRanking: team1.FIBARanking },
+                    { code: team2.ISOCode, fibaRanking: team2.FIBARanking }
                 );
                 console.log(`${team1.Team} - ${team2.Team} (${result.team1Score}:${result.team2Score})`);
                 updateStandings(standings[groupName], team1, team2, result);
@@ -137,9 +137,9 @@ function flattenArray(arr) {
 
 // Draw elimination phase
 function drawElimination(standings) {
-    const topTeams = flattenArray(Object.values(standings).map(rankTeams)).slice(0, 9);
+    const topTeams = flattenArray(Object.values(standings).map(rankTeams)).slice(0, 8);
 
-    const [first, second, third, fourth, fifth, sixth, seventh, eighth, ninth] = topTeams;
+    const [first, second, third, fourth, fifth, sixth, seventh, eighth] = topTeams;
 
     // Elimination draw
     const draw = {
@@ -174,8 +174,8 @@ function simulateElimination(draw) {
         }
 
         const result = simulateMatch(
-            { ISOCode: team1, fibaRanking: team1Data.FIBARanking },
-            { ISOCode: team2, fibaRanking: team2Data.FIBARanking }
+            { code: team1, fibaRanking: team1Data.FIBARanking },
+            { code: team2, fibaRanking: team2Data.FIBARanking }
         );
         console.log(`${team1Data.Team} - ${team2Data.Team} (${result.team1Score}:${result.team2Score})`);
         results[team1] = result.team1Score > result.team2Score ? 'W' : 'L';
@@ -205,8 +205,8 @@ function simulateElimination(draw) {
         }
 
         const result = simulateMatch(
-            { ISOCode: team1, fibaRanking: team1Data.FIBARanking },
-            { ISOCode: team2, fibaRanking: team2Data.FIBARanking }
+            { code: team1, fibaRanking: team1Data.FIBARanking },
+            { code: team2, fibaRanking: team2Data.FIBARanking }
         );
         console.log(`${team1Data.Team} - ${team2Data.Team} (${result.team1Score}:${result.team2Score})`);
         semifinalResults[team1] = result.team1Score > result.team2Score ? 'W' : 'L';
@@ -223,8 +223,8 @@ function simulateElimination(draw) {
     // Simulate the third-place match
     console.log(`\nUtakmica za treće mesto:`);
     const thirdPlaceResult = simulateMatch(
-        { ISOCode: thirdPlaceTeam, fibaRanking: flattenArray(Object.values(groupsData)).find(t => t.ISOCode === thirdPlaceTeam).FIBARanking },
-        { ISOCode: semifinalResults[finalist1] === 'L' ? finalist1 : finalist2, fibaRanking: flattenArray(Object.values(groupsData)).find(t => t.ISOCode === (semifinalResults[finalist1] === 'L' ? finalist1 : finalist2)).FIBARanking }
+        { code: thirdPlaceTeam, fibaRanking: flattenArray(Object.values(groupsData)).find(t => t.ISOCode === thirdPlaceTeam).FIBARanking },
+        { code: semifinalResults[finalist1] === 'L' ? finalist1 : finalist2, fibaRanking: flattenArray(Object.values(groupsData)).find(t => t.ISOCode === (semifinalResults[finalist1] === 'L' ? finalist1 : finalist2)).FIBARanking }
     );
     console.log(`${thirdPlaceTeam} - ${semifinalResults[finalist1] === 'L' ? finalist1 : finalist2} (${thirdPlaceResult.team1Score}:${thirdPlaceResult.team2Score})`);
     const thirdPlaceWinner = thirdPlaceResult.team1Score > thirdPlaceResult.team2Score ? thirdPlaceTeam : (semifinalResults[finalist1] === 'L' ? finalist1 : finalist2);
@@ -232,8 +232,8 @@ function simulateElimination(draw) {
     // Simulate the final
     console.log(`\nFinale:`);
     const finalResult = simulateMatch(
-        { ISOCode: finalist1, fibaRanking: flattenArray(Object.values(groupsData)).find(t => t.ISOCode === finalist1).FIBARanking },
-        { ISOCode: finalist2, fibaRanking: flattenArray(Object.values(groupsData)).find(t => t.ISOCode === finalist2).FIBARanking }
+        { code: finalist1, fibaRanking: flattenArray(Object.values(groupsData)).find(t => t.ISOCode === finalist1).FIBARanking },
+        { code: finalist2, fibaRanking: flattenArray(Object.values(groupsData)).find(t => t.ISOCode === finalist2).FIBARanking }
     );
     console.log(`${finalist1} - ${finalist2} (${finalResult.team1Score}:${finalResult.team2Score})`);
     const finalWinner = finalResult.team1Score > finalResult.team2Score ? finalist1 : finalist2;
@@ -244,7 +244,6 @@ function simulateElimination(draw) {
     console.log(`    2. ${finalist1 === finalWinner ? finalist2 : finalist1}`);
     console.log(`    3. ${thirdPlaceWinner}`);
 }
-
 
 // Main function to run the simulation
 function main() {
